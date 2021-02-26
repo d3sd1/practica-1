@@ -13,7 +13,31 @@ int main(int argc, char *argv[]) {
         printf("Not enough arguments\n");
         return -1;
     }
+    int descriptor;    //Descriptor del fichero
+    char buf[BUFFER_SIZE];    //Declaramos el buffer con el tamaño indicado
 
+    descriptor = open(argv[1], O_RDONLY);
+    if (descriptor < 0) {
+        printf("Error opening file.\n");
+        return -1;
+    }
+
+    int nread, nwrite;
+    while ((nread = read(descriptor, buf, BUFFER_SIZE)) > 0) {
+        do {
+            nwrite = write(STDOUT_FILENO, buf, nread);
+            if (nwrite < 0) {
+                if (close(descriptor) < 0) {
+                    printf("Error closing file.\n");
+                    return -1;
+                }
+                printf("Error writing output to terminal.\n");
+                return -1;
+            }
+            nread -= nwrite;
+
+        } while (nread > 0);
+    }
 
     return 0;
 }
