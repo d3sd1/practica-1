@@ -9,13 +9,33 @@
 int main(int argc, char *argv[]) {
 
     DIR *descriptor;
+    /*
+     * Use current path
+     */
     char buffer[PATH_MAX];
     getcwd(buffer, PATH_MAX);
     descriptor = opendir(buffer);
 
+    /*
+     * Error opening
+     */
+    if (descriptor == NULL) {
+        printf("Error opening path\n");
+        return -1;
+    }
+    /*
+     * Read each file inside path
+     */
     struct dirent *file;
     mainReader:
     while ((file = readdir(descriptor)) != NULL) {
+        /*
+         * LSEEK
+         */
+        if (file->d_type == DT_REG) {
+            /*
+             * Open file
+             */
             int fDescriptor = open(file->d_name, O_RDONLY);
             if (fDescriptor < 0) {
                 printf("Error opening file -> %s\n", file->d_name);
@@ -32,8 +52,15 @@ int main(int argc, char *argv[]) {
                 printf("Error closing file -> %s\n", file->d_name);
                 return -1;
             }
+        }
 
-
+    }
+    /*
+     * Close path
+     */
+    if (closedir(descriptor) == -1) {
+        printf("Error closing path\n");
+        return -1;
     }
     return 0;
 }

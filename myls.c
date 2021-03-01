@@ -13,6 +13,16 @@ int main(int argc, char *argv[]) {
         getcwd(buf, PATH_MAX);
         descriptor = opendir(buf);
     }
+    else if (argc == 2) {
+        descriptor = opendir(argv[1]);
+
+    }
+    else {
+        printf("Invalid arguments size.\n");
+        return -1;
+    }
+
+
     if (descriptor == NULL) {
         printf("Error opening file.\n");
         return -1;
@@ -23,5 +33,9 @@ int main(int argc, char *argv[]) {
         printf("%s\n", file->d_name);
     }
 
+    if (closedir(descriptor) == -1) {
+        printf("Error closing path.\n");
+        return -1;
+    }
     return 0;
 }
